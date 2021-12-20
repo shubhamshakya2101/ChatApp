@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat App</title>
+    <style>
+
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');
+
+      * {
+         margin: 0;
+          padding: 0; 
+          box-sizing: border-box; 
+        }
+      body {
+         font-size: 15px;
+         font-weight: normal;
+         color: white;
+         font-family: "Montserrat" , sans-serif;
+         background-image: url("https://www.transparenttextures.com/patterns/brick-wall.png");
+         background-color: #e28f83;
+      }
+      form { 
+        /* background: #fff; */
+        background-image: url("https://www.transparenttextures.com/patterns/brick-wall.png");
+        background-color: #e28f83;
+        padding: 3px; 
+        position: fixed;
+        bottom: 0; width: 100%;
+        /* border-color: #000;
+        border-top-style: solid; 
+        border-top-width: 1px; */
+          }
+      form input {
+         border-style: solid ;
+         border-width: 1px; 
+         padding: 10px; 
+         width: 90%;
+         margin-right: .5%; 
+         background-color:white; 
+        }
+      form button { 
+        width: 8%; 
+        /* background: rgb(130, 224, 255);  */
+        background-color: #fa9905;
+        border: none; 
+        padding: 10px; 
+        margin-left: 1%;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        font-weight: bolder;
+        font-family: "Montserrat" , sans-serif;
+       }
+      #messages { 
+        list-style-type: none; 
+        margin: 0; 
+        padding: 0;
+       }
+      #messages li { 
+        padding: 5px 10px; 
+      }
+      #messages li:nth-child(odd) { 
+        background-image: url("https://www.transparenttextures.com/patterns/brick-wall.png");
+        background-color: #e28f83;
+       }
+  </style>
+    <script src="../../socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  </head>
+  <body>
+    <h3 style="background-color: skyblue; border-radius: 10px; text-align:center; width: 25%; justify-content: center; margin-left: 40%; padding: 10px;">Chat Application by Shubham</h3>
+
+    <ul id="messages"></ul>
+    <form action="/" method="POST" id="chatForm">
+      <input id="txt" autocomplete="off" autofocus="on" oninput="isTyping()" placeholder="Type a message here..." /><button>Send</button>
+    </form>
+    <script>
+            var socket = io.connect('http://localhost:3000');
+
+            // submit text message without reload/refresh the page
+            $('form').submit(function(e){
+                e.preventDefault(); // prevents page reloading
+                socket.emit('chat_message', $('#txt').val());
+                $('#txt').val('');
+                return false;
+            });
+
+            // append the text message
+            socket.on('chat_message', function(msg){
+                $('#messages').append($('<li>').html(msg));
+            });
+
+            // append text if someone is online
+            socket.on('is_online', function(username) {
+                $('#messages').append($('<li>').html(username));
+            });
+
+            // ask username
+            var username = prompt("Hey 🖐️ Please Enter your name");
+            socket.emit('username', username);
+
+    </script>
+  </body>
+</html>
